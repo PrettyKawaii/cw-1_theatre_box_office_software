@@ -20,11 +20,8 @@ std::string getPassword()
     return password;
 }
 
-
-
-int main()
+void authorisation()
 {
-    //std::cout << "Hello World!\n";
     std::string admin_login, admin_password, input_login, input_password;
 
     admin_login = "adminus";
@@ -47,6 +44,56 @@ int main()
             std::cin;
         }
     }
+}
+
+void printAccountMenu()
+{
+    std::cout << "Операции над учётными записями:\n1. Показать все; 2. Добавить; 3. Редактировать; 4. Удалить\n9. Назад. \n"
+        << "> ";
+}
+
+void showAll();
+void add();
+void edit();
+void remove();
+
+
+
+
+int main()
+{
+    
+    authorisation();
+
+    bool exit = false;
+    int choice;
+    while (!exit)
+    {
+        printAccountMenu();
+        std::cin >> choice;
+        switch (choice)
+        {
+        case 1:
+            std::cout << "В процессе разработки" << std::endl;
+            break;
+        case 2:
+            std::cout << "В процессе разработки" << std::endl;
+            break;
+        case 3:
+            std::cout << "В процессе разработки" << std::endl;
+            break;
+        case 4:
+            std::cout << "В процессе разработки" << std::endl;
+            break;
+        case 9:
+            exit = true;
+            authorisation();
+            break;
+        default:
+            break;
+        }
+    }
+
 
 
 

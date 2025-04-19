@@ -14,12 +14,6 @@ int main() {
             }
             k++;
         }
-        else
-        {
-            std::cout << "Yess!";
-            std::cout << "\b \b";
-            k--;
-        }
         
     }
     pin[k - 1] = '\0';
