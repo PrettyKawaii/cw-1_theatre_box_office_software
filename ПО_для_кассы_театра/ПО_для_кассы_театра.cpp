@@ -1,116 +1,71 @@
-﻿// ПО_для_кассы_театра.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-#include <iostream>
-#include <stdio.h>                      
-#include <string.h>
-#include <string>
+﻿#include "ticket_system.h"
 
-std::string getLogin()
-{
-    std::string login;
-    std::cout << "Введите логин: ";
-    std::cin >> login;
-    return login;
-}
-std::string getPassword()
-{
-    std::string password;
-    std::cout << "Введите пароль: ";
-    std::cin >> password;
-    return password;
-}
+int main() {
+    TicketManager ticketManager("tickets.txt");
+    UserManager userManager("users.txt");
 
-void authorisation()
-{
-    std::string admin_login, admin_password, input_login, input_password;
-
-    admin_login = "adminus";
-    admin_password = "easy_password";
-
-    bool isMatched = false;
-
-    while (!isMatched)
-    {
-        input_login = getLogin();
-        input_password = getPassword();
-        if (input_login == admin_login && input_password == admin_password)
-        {
-            std::cout << "Авторизация прошла успешно. Вы администратор." << std::endl;
-            isMatched = true;
-        }
-        else
-        {
-            std::cout << "Неверная комбинация логина и пароля. Повторите попытку." << std::endl;
-            std::cin;
-        }
+    // Добавляем администратора по умолчанию, если файл пустой
+    if (userManager.getAllUsers().empty()) {
+        userManager.addUser("admin", "admin123", true);
+        userManager.addUser("user", "user123", false);
     }
-}
-
-void printAccountMenu()
-{
-    std::cout << "Операции над учётными записями:\n1. Показать все; 2. Добавить; 3. Редактировать; 4. Удалить\n9. Назад. \n"
-        << "> ";
-}
-
-void showAll();
-void add();
-void edit();
-void remove();
-
-
-
-
-int main()
-{
-    
-    authorisation();
 
     bool exit = false;
-    int choice;
-    while (!exit)
-    {
-        printAccountMenu();
+    while (!exit) {
+        std::cout << "\nГлавное меню:\n";
+        std::cout << "1. Вход как администратор\n";
+        std::cout << "2. Вход как пользователь\n";
+        std::cout << "3. Выход\n";
+        std::cout << "> ";
+
+        int choice;
         std::cin >> choice;
-        switch (choice)
-        {
-        case 1:
-            std::cout << "В процессе разработки" << std::endl;
+
+        switch (choice) {
+        case 1: {
+            std::string login, password;
+            bool isAdmin;
+            std::cout << "Логин: ";
+            std::cin >> login;
+            std::cout << "Пароль: ";
+            std::cin >> password;
+
+            if (userManager.authenticate(login, password, isAdmin)) {
+                if (isAdmin) {
+                    showAdminMenu(ticketManager, userManager);
+                }
+                else {
+                    std::cout << "У вас нет прав администратора!\n";
+                }
+            }
+            else {
+                std::cout << "Неверный логин или пароль!\n";
+            }
             break;
-        case 2:
-            std::cout << "В процессе разработки" << std::endl;
+        }
+        case 2: {
+            std::string login, password;
+            bool isAdmin;
+            std::cout << "Логин: ";
+            std::cin >> login;
+            std::cout << "Пароль: ";
+            std::cin >> password;
+
+            if (userManager.authenticate(login, password, isAdmin)) {
+                showUserMenu(ticketManager);
+            }
+            else {
+                std::cout << "Неверный логин или пароль!\n";
+            }
             break;
+        }
         case 3:
-            std::cout << "В процессе разработки" << std::endl;
-            break;
-        case 4:
-            std::cout << "В процессе разработки" << std::endl;
-            break;
-        case 9:
             exit = true;
-            authorisation();
             break;
         default:
-            break;
+            std::cout << "Неверный выбор!\n";
         }
     }
 
-
-
-
+    return 0;
 }
-
-
-
-
-
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

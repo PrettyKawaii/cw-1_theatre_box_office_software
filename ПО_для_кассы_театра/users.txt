@@ -1,0 +1,2 @@
+admin admin123 1
+user user123 0
