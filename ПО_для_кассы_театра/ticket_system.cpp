@@ -1,4 +1,5 @@
 #include "ticket_system.h"
+#include "string"
 
 // Реализация TicketManager
 TicketManager::TicketManager(const std::string& filename) : dataFile(filename) {
@@ -142,7 +143,7 @@ Ticket inputTicket() {
     std::getline(std::cin, ticket.performance);
     std::cout << "Введите номер зала: ";
     std::cin >> ticket.hallNumber;
-    std::cout << "Введите зону (партер/балкон/бельэтаж): ";
+    std::cout << "Введите зону (parter/balcony/beletage ): ";
     std::cin >> ticket.zone;
     std::cout << "Введите номер места: ";
     std::cin >> ticket.seatNumber;
@@ -152,21 +153,43 @@ Ticket inputTicket() {
 }
 
 void printTickets(const std::vector<Ticket>& tickets) {
+    std::string m1 = "+===========================================================+";
+    std::cout << m1 << std::endl;
     std::cout << "\nСписок билетов:\n";
-    std::cout << std::setw(5) << "ID" << std::setw(12) << "Дата" << std::setw(10) << "Время"
-        << std::setw(20) << "Представление" << std::setw(10) << "Зал"
-        << std::setw(10) << "Зона" << std::setw(10) << "Место" << std::setw(10) << "Ограничение\n";
+    /*std::cout << std::setw(3) << "ID" << std::setw(24) << "Дата" << std::setw(22) << "Время"
+        << std::setw(30) << "Представление" << std::setw(8) << "Зал"
+        << std::setw(10) << "Зона" << std::setw(10) << "Место" << std::setw(28) << "Ограничение\n";
     for (const auto& ticket : tickets) {
-        std::cout << std::setw(5) << ticket.id << std::setw(12) << ticket.date << std::setw(10) << ticket.time
-            << std::setw(20) << ticket.performance << std::setw(10) << ticket.hallNumber
-            << std::setw(10) << ticket.zone << std::setw(10) << ticket.seatNumber << std::setw(10) << ticket.ageLimit << "\n";
+        std::cout << std::setw(3) << ticket.id << std::setw(12) << ticket.date << std::setw(11) << ticket.time
+            << std::setw(30) << ticket.performance << std::setw(8) << ticket.hallNumber
+            << std::setw(10) << ticket.zone << std::setw(10) << ticket.seatNumber << std::setw(28) << ticket.ageLimit << "\n";
+    }*/
+    std::cout << "---\n";
+#include <iomanip> // для std::setw
+
+    // Определяем длину самого длинного поля
+    const int max_field_length = 13; // "Представление" - 13 символов
+
+    for (const auto& ticket : tickets) {
+        std::cout << "Билет ID " << ticket.id << "\n";
+
+        std::cout << "Дата"; std::cout << std::setw(max_field_length - 4 + 3); std::cout << ": " << ticket.date << "\n";
+        std::cout << "Время"; std::cout << std::setw(max_field_length - 5 + 3); std::cout << ": " << ticket.time << "\n";
+        std::cout << "Представление"; std::cout << std::setw(max_field_length - 13 + 3); std::cout << ": " << ticket.performance << "\n";
+        std::cout << "Зал"; std::cout << std::setw(max_field_length - 3 + 3); std::cout << ": " << ticket.hallNumber << "\n";
+        std::cout << "Зона"; std::cout << std::setw(max_field_length - 4 + 3); std::cout << ": " << ticket.zone << "\n";
+        std::cout << "Место"; std::cout << std::setw(max_field_length - 5 + 3); std::cout << ": " << ticket.seatNumber << "\n";
+        std::cout << "Ограничение"; std::cout << std::setw(max_field_length - 11 + 3); std::cout << ": " << ticket.ageLimit << "\n";
+
+        std::cout << "---\n";  // разделитель между билетами
     }
+    std::cout << m1 << std::endl;
 }
 
 void printUsers(const std::vector<User>& users) {
     std::cout << "\nСписок пользователей:\n";
-    std::cout << std::setw(20) << "Логин" << std::setw(20) << "Пароль"
-        << std::setw(15) << "Администратор\n";
+    std::cout << std::setw(40) << "Логин" << std::setw(40) << "Пароль"
+        << std::setw(30) << "Администратор\n";
     for (const auto& user : users) {
         std::cout << std::setw(20) << user.login << std::setw(20) << user.password
             << std::setw(15) << (user.isAdmin ? "Да" : "Нет") << "\n";

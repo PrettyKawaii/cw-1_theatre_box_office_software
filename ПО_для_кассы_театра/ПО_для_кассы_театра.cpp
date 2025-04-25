@@ -3,7 +3,7 @@
 int main() {
     TicketManager ticketManager("tickets.txt");
     UserManager userManager("users.txt");
-
+    
     // Добавляем администратора по умолчанию, если файл пустой
     if (userManager.getAllUsers().empty()) {
         userManager.addUser("admin", "admin123", true);
