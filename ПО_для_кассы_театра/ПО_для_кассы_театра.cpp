@@ -9,13 +9,22 @@ int main() {
         userManager.addUser("admin", "admin123", true);
         userManager.addUser("user", "user123", false);
     }
-
+    std::string m1 = "+============================+";
+    std::string m2 = "+----------------------------+";
+    int var = 44;
     bool exit = false;
     while (!exit) {
-        std::cout << "\nГлавное меню:\n";
-        std::cout << "1. Вход как администратор\n";
-        std::cout << "2. Вход как пользователь\n";
-        std::cout << "3. Выход\n";
+        std::cout << m1 << std::endl;
+        std::cout << std::setw(var) << std::left << "|Меню авторизации" << std::right << "|" << std::endl;
+        std::cout << m1 << std::endl;
+
+        std::cout << std::setw(var+5) << std::left << "|1. Вход как администратор" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var+4) << std::left << "|2. Вход как пользователь" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var-10) << std::left << "|3. Выход" << std::right << "|" << std::endl;
+        std::cout << m1 << std::endl;
+
         std::cout << "> ";
 
         int choice;
@@ -25,21 +34,23 @@ int main() {
         case 1: {
             std::string login, password;
             bool isAdmin;
-            std::cout << "Логин: ";
+            
+            std::cout << "\nЛогин: ";
             std::cin >> login;
             std::cout << "Пароль: ";
             std::cin >> password;
 
             if (userManager.authenticate(login, password, isAdmin)) {
                 if (isAdmin) {
+                    std::cout << "\nВы успешно авторизовались как администратор.\n" << std::endl;
                     showAdminMenu(ticketManager, userManager);
                 }
                 else {
-                    std::cout << "У вас нет прав администратора!\n";
+                    std::cout << "\nУ вас нет прав администратора!\n";
                 }
             }
             else {
-                std::cout << "Неверный логин или пароль!\n";
+                std::cout << "\nНеверный логин или пароль!\n\n";
             }
             break;
         }
@@ -52,10 +63,11 @@ int main() {
             std::cin >> password;
 
             if (userManager.authenticate(login, password, isAdmin)) {
+                std::cout << "\nВы успешно авторизовались как пользователь." << std::endl;
                 showUserMenu(ticketManager);
             }
             else {
-                std::cout << "Неверный логин или пароль!\n";
+                std::cout << "Неверный логин или пароль!\n\n";
             }
             break;
         }

@@ -1,4 +1,5 @@
 #include "ticket_system.h"
+#include <iomanip> // для std::setw
 #include "string"
 
 // Реализация TicketManager
@@ -153,60 +154,103 @@ Ticket inputTicket() {
 }
 
 void printTickets(const std::vector<Ticket>& tickets) {
-    std::string m1 = "+===========================================================+";
+    std::string m1 = "+=======================================+";
+    std::string m2 = "+---------------------------------------+";
+    int l1 = 19+4;
+    std::cout << "\n";
     std::cout << m1 << std::endl;
     std::cout << "\nСписок билетов:\n";
-    /*std::cout << std::setw(3) << "ID" << std::setw(24) << "Дата" << std::setw(22) << "Время"
-        << std::setw(30) << "Представление" << std::setw(8) << "Зал"
-        << std::setw(10) << "Зона" << std::setw(10) << "Место" << std::setw(28) << "Ограничение\n";
-    for (const auto& ticket : tickets) {
-        std::cout << std::setw(3) << ticket.id << std::setw(12) << ticket.date << std::setw(11) << ticket.time
-            << std::setw(30) << ticket.performance << std::setw(8) << ticket.hallNumber
-            << std::setw(10) << ticket.zone << std::setw(10) << ticket.seatNumber << std::setw(28) << ticket.ageLimit << "\n";
-    }*/
-    std::cout << "---\n";
-#include <iomanip> // для std::setw
-
+    std::cout << m1 << std::endl;
     // Определяем длину самого длинного поля
     const int max_field_length = 13; // "Представление" - 13 символов
+    bool isFirstTicket = true;
+
 
     for (const auto& ticket : tickets) {
-        std::cout << "Билет ID " << ticket.id << "\n";
 
-        std::cout << "Дата"; std::cout << std::setw(max_field_length - 4 + 3); std::cout << ": " << ticket.date << "\n";
-        std::cout << "Время"; std::cout << std::setw(max_field_length - 5 + 3); std::cout << ": " << ticket.time << "\n";
-        std::cout << "Представление"; std::cout << std::setw(max_field_length - 13 + 3); std::cout << ": " << ticket.performance << "\n";
-        std::cout << "Зал"; std::cout << std::setw(max_field_length - 3 + 3); std::cout << ": " << ticket.hallNumber << "\n";
-        std::cout << "Зона"; std::cout << std::setw(max_field_length - 4 + 3); std::cout << ": " << ticket.zone << "\n";
-        std::cout << "Место"; std::cout << std::setw(max_field_length - 5 + 3); std::cout << ": " << ticket.seatNumber << "\n";
-        std::cout << "Ограничение"; std::cout << std::setw(max_field_length - 11 + 3); std::cout << ": " << ticket.ageLimit << "\n";
+        if (!isFirstTicket)
+        {
+            std::cout << m2 << std::endl;  // разделитель между билетами
+        }
+        isFirstTicket = false;
+        std::cout << std::left <<"|Билет ID " << std::left << std::setw(30) << ticket.id << "|\n";
 
-        std::cout << "---\n";  // разделитель между билетами
+        std::cout << "|Дата"; std::cout << std::setw(max_field_length - 4 + 3); std::cout << ": " << std::left << std::setw(l1) << ticket.date << "|\n";
+        std::cout << "|Время"; std::cout << std::setw(max_field_length - 5 + 3); std::cout << ": " << std::left << std::setw(l1) << ticket.time << "|\n";
+        std::cout << "|Представление"; std::cout << std::setw(max_field_length - 13 + 3); std::cout << ": " << std::left << std::setw(l1) << ticket.performance << "|\n";
+        std::cout << "|Зал"; std::cout << std::setw(max_field_length - 3 + 3); std::cout << ": " << std::left << std::setw(l1) << ticket.hallNumber << "|\n";
+        std::cout << "|Зона"; std::cout << std::setw(max_field_length - 4 + 3); std::cout << ": " << std::left << std::setw(l1) << ticket.zone << "|\n";
+        std::cout << "|Место"; std::cout << std::setw(max_field_length - 5 + 3); std::cout << ": " << std::left << std::setw(l1) << ticket.seatNumber << "|\n";
+        std::cout << "|Ограничение"; std::cout << std::setw(max_field_length - 11 + 3); std::cout << ": " << std::left << std::setw(l1) << ticket.ageLimit << "|\n";
+
     }
     std::cout << m1 << std::endl;
 }
 
 void printUsers(const std::vector<User>& users) {
-    std::cout << "\nСписок пользователей:\n";
-    std::cout << std::setw(40) << "Логин" << std::setw(40) << "Пароль"
-        << std::setw(30) << "Администратор\n";
+                  
+    std::string m1 = "+==============+=============+=============+";
+    std::string m2 = "+--------------+-------------+-------------+";
+    bool isFirstUser = true;
+    std::string adminStatus;
+    int var;
+
+    std::cout << "\nСписок пользователей\n";
+    std::cout << m1 << std::endl;
+    std::cout << std::left << std::setw(20) << "|Логин" << std::setw(20) << "|Пароль"
+        << std::setw(15) << "|Администратор|\n";
+    std::cout << m1 << std::endl;
     for (const auto& user : users) {
-        std::cout << std::setw(20) << user.login << std::setw(20) << user.password
-            << std::setw(15) << (user.isAdmin ? "Да" : "Нет") << "\n";
+        if (!isFirstUser)
+        {
+            std::cout << m2 << std::endl;
+        }
+        isFirstUser = false;
+
+        if (user.isAdmin)
+        {
+            adminStatus = "Да";
+            var = 15;
+        }
+        else
+        {
+            adminStatus = "Нет";
+            var = 16;
+        }
+
+        std::cout  << "|" << std::left << std::setw(14) <<  user.login << "|" << std::setw(13) <<std::left<< user.password
+            << "|" << std::left << std::setw(var) << adminStatus << "|" << "\n";
+
+        
     }
+    std::cout << m1 << std::endl;
 }
 void showTicketMenu(TicketManager& ticketManager) {
     int choice;
     bool back = false;
+    std::string m1 = "+===========================+";
+    std::string m2 = "+---------------------------+";
+    int var = 43;
 
     while (!back) {
-        std::cout << "\nУправление билетами:\n";
-        std::cout << "1. Просмотреть все билеты\n";
-        std::cout << "2. Добавить билет\n";
-        std::cout << "3. Редактировать билет\n";
-        std::cout << "4. Удалить билет\n";
-        std::cout << "5. Фильтровать билеты\n";
-        std::cout << "6. Назад\n";
+        std::cout << "\n";
+
+        std::cout << m1 << std::endl;
+        std::cout << std::setw(var + 3) << std::left << "|Управление билетами" << std::right << "|" << std::endl;
+        std::cout << m1 << std::endl;
+        std::cout << std::setw(var + 5) << std::left << "|1. Просмотреть все билеты" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var - 2) << std::left << "|2. Добавить билет" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var + 3) << std::left << "|3. Редактировать билет" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var - 3) << std::left << "|4. Удалить билет" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var + 2) << std::left << "|5. Фильтровать билеты" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var - 10) << std::left << "|6. Назад" << std::right << "|" << std::endl;
+        std::cout << m1 << std::endl;
+
         std::cout << "> ";
         std::cin >> choice;
 
@@ -261,14 +305,27 @@ void showTicketMenu(TicketManager& ticketManager) {
 void showUserMenu(UserManager& userManager) {
     int choice;
     bool back = false;
+    std::string m1 = "+=================================+";
+    std::string m2 = "+---------------------------------+";
+    int var = 43;
 
     while (!back) {
-        std::cout << "\nУправление пользователями:\n";
-        std::cout << "1. Просмотреть всех пользователей\n";
-        std::cout << "2. Добавить пользователя\n";
-        std::cout << "3. Редактировать пользователя\n";
-        std::cout << "4. Удалить пользователя\n";
-        std::cout << "5. Назад\n";
+        
+        std::cout << std::endl;
+        std::cout << m1 << std::endl;
+        std::cout << std::setw(var + 15) << std::left << "|Управление пользователями" << std::right << "|" << std::endl;
+        std::cout << m1 << std::endl;
+        std::cout << std::setw(var + 3) << std::left << "|1. Просмотреть всех пользователей" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var + 11) << std::left << "|2. Добавить пользователя" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var + 16) << std::left << "|3. Редактировать пользователя" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var + 10) << std::left << "|4. Удалить пользователя" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var - 4) << std::left << "|5. Назад" << std::right << "|" << std::endl;
+        std::cout << m1 << std::endl;
+
         std::cout << "> ";
         std::cin >> choice;
 
@@ -324,12 +381,23 @@ void showUserMenu(UserManager& userManager) {
 void showAdminMenu(TicketManager& ticketManager, UserManager& userManager) {
     int choice;
     bool back = false;
+    std::string m1 = "+============================+";
+    std::string m2 = "+----------------------------+";
+    int var = 44;
+
 
     while (!back) {
-        std::cout << "\nМеню администратора:\n";
-        std::cout << "1. Управление билетами\n";
-        std::cout << "2. Управление пользователями\n";
-        std::cout << "3. Выход\n";
+        //std::cout << "\n";
+        std::cout << m1 << std::endl;
+        std::cout << std::setw(var+3) << std::left << "|Меню администратора" << std::right << "|" << std::endl;
+        std::cout << m1 << std::endl;
+        std::cout << std::setw(var+3) << std::left << "|1. Управление билетами" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var) << std::left << "|2. Управление пользователями" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var-10) << std::left << "|3. Выход" << std::right << "|" << std::endl;
+        std::cout << m1 << std::endl;
+
         std::cout << "> ";
         std::cin >> choice;
 
@@ -354,10 +422,21 @@ void showUserMenu(TicketManager& ticketManager) {
     bool back = false;
 
     while (!back) {
-        std::cout << "\nМеню пользователя:\n";
-        std::cout << "1. Просмотреть все билеты\n";
-        std::cout << "2. Поиск билетов\n";
-        std::cout << "3. Выход\n";
+
+        std::string m1 = "+===========================+";
+        std::string m2 = "+---------------------------+";
+        int var = 43;
+
+        std::cout << m1 << std::endl;
+        std::cout << std::setw(var + 3) << std::left << "|Меню пользователя" << std::right << "|" << std::endl;
+        std::cout << m1 << std::endl;
+        std::cout << std::setw(var + 3) << std::left << "|1. Просмотреть все билеты" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var + 3) << std::left << "|2. Поиск билетов" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var - 10) << std::left << "|3. Выход" << std::right << "|" << std::endl;
+        std::cout << m1 << std::endl;
+
         std::cout << "> ";
         std::cin >> choice;
 
