@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{6470d057-d96e-4a31-b7fd-582680dba73d}</ProjectGuid>
-    <RootNamespace>ПОдлякассытеатра</RootNamespace>
+    <ProjectGuid>{584e6749-a040-4166-8c59-78c572d7315b}</ProjectGuid>
+    <RootNamespace>Sandbox</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,13 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="TicketDisplay.cpp" />
-    <ClCompile Include="ticket_system.cpp" />
-    <ClCompile Include="ПО_для_кассы_театра.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="TicketDisplay.h" />
-    <ClInclude Include="ticket_system.h" />
+    <ClCompile Include="hide_password.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
