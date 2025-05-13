@@ -1,6 +1,8 @@
 #include "ticket_system.h"
-#include <iomanip> // для std::setw
+#include <iostream>
 #include "string"
+#include <iomanip> // для std::setw
+#include <regex>
 
 // Реализация TicketManager
 TicketManager::TicketManager(const std::string& filename) : dataFile(filename) {
@@ -9,6 +11,18 @@ TicketManager::TicketManager(const std::string& filename) : dataFile(filename) {
 
 TicketManager::~TicketManager() {
     saveTickets();
+}
+
+// Не-const версия (для изменения билета)
+std::vector<Ticket>::iterator TicketManager::findTicket(int id) {
+    return std::find_if(tickets.begin(), tickets.end(),
+        [id](const Ticket& t) { return t.id == id; });
+}
+
+// Const-версия (только для чтения)
+std::vector<Ticket>::const_iterator TicketManager::findTicket(int id) const {
+    return std::find_if(tickets.cbegin(), tickets.cend(),
+        [id](const Ticket& t) { return t.id == id; });
 }
 
 void TicketManager::loadTickets() {
@@ -35,21 +49,34 @@ void TicketManager::saveTickets() {
     }
 }
 
+int TicketManager::generateNextId() {
+    int maxId = 0;
+    for (const auto& t : tickets) if (t.id > maxId) maxId = t.id;
+    return maxId + 1;
+}
+
 void TicketManager::addTicket(const Ticket& ticket) {
     tickets.push_back(ticket);
 }
 
 void TicketManager::editTicket(int id, const Ticket& newTicket) {
-    auto it = std::find_if(tickets.begin(), tickets.end(),
-        [id](const Ticket& t) { return t.id == id; });
-    if (it != tickets.end()) {
-        *it = newTicket;
+    auto it = findTicket(id);
+    if (it == tickets.end()) {
+        std::cerr << "Ошибка: Билет с ID " << id << " не найден!\n";
+        return;
     }
+    *it = newTicket;  // Заменяем старый билет новыми данными
+    std::cout << "Билет успешно изменен.\n";
 }
 
 void TicketManager::removeTicket(int id) {
-    tickets.erase(std::remove_if(tickets.begin(), tickets.end(),
-        [id](const Ticket& t) { return t.id == id; }), tickets.end());
+    auto it = findTicket(id);
+    if (it == tickets.end()) {
+        std::cerr << "Ошибка: Билет с ID " << id << " не найден!\n";
+        return;
+    }
+    tickets.erase(it);
+    std::cout << "Билет успешно удален.\n";
 }
 
 std::vector<Ticket> TicketManager::getAllTickets() const {
@@ -102,7 +129,7 @@ bool UserManager::authenticate(const std::string& login, const std::string& pass
     auto it = std::find_if(users.begin(), users.end(),
         [&](const User& u) { return u.login == login && u.password == password; });
     if (it != users.end()) {
-        isAdmin = it->isAdmin;
+        isAdmin = it -> isAdmin;
         return true;
     }
     return false;
@@ -130,26 +157,139 @@ std::vector<User> UserManager::getAllUsers() const {
     return users;
 }
 
+std::string inputDate() {
+    std::regex datePattern(R"((\d{2})\.(\d{2})\.(\d{4}))"); // Группы для дня, месяца и года
+    std::string date;
+
+    while (true) {
+        std::cout << "Введите дату (дд.мм.гггг): ";
+        std::cin >> date;
+
+        std::smatch matches;
+        if (!std::regex_match(date, matches, datePattern)) {
+            std::cerr << "Ошибка: неверный формат даты!\n";
+            continue;
+        }
+
+        // Извлекаем день, месяц и год
+        int day = std::stoi(matches[1].str());
+        int month = std::stoi(matches[2].str());
+        int year = std::stoi(matches[3].str());
+
+        // Проверяем диапазоны
+        if (month < 1 || month > 12) {
+            std::cerr << "Ошибка: месяц должен быть от 01 до 12!\n";
+            continue;
+        }
+
+        if (day < 1 || day > 31) {
+            std::cerr << "Ошибка: день должен быть от 01 до 31!\n";
+            continue;
+        }
+
+        // Дополнительная проверка на корректность дня в месяце (например, 30.02 или 31.04)
+        // Можно добавить проверку високосного года для февраля
+        bool isValid = true;
+        if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+            isValid = false;
+        }
+        else if (month == 2) {
+            bool isLeap = (year % 400 == 0) || (year % 100 != 0 && year % 4 == 0);
+            if (day > (isLeap ? 29 : 28)) {
+                isValid = false;
+            }
+        }
+
+        if (!isValid) {
+            std::cerr << "Ошибка: некорректная дата (день не соответствует месяцу)!\n";
+            continue;
+        }
+
+        return date;
+    }
+}
+std::string inputTime()
+{
+    std::regex timePattern(R"((\d{2})\:(\d{2}))"); // чч:мм
+    std::string time;
+    std::smatch matches;
+    while (true)
+    {
+        std::cout << "Введите время (чч:мм): ";
+        std::cin >> time;
+
+        if (!std::regex_match(time, matches, timePattern))
+        {
+            std::cerr << "Ошибка: некорректный формат времени!\n";
+            continue;
+        }
+        
+        int hour = std::stoi(matches[1].str());
+        int mininutes = std::stoi(matches[2].str());
+        
+        if (hour < 0 || hour > 23) {
+            std::cerr << "Ошибка: час должен быть от 00 до 23!\n";
+            continue;
+        }
+        if (mininutes < 0 || mininutes > 59) {
+            std::cerr << "Ошибка: минуты должны быть от 00 до 59!\n";
+            continue;
+        }
+    return time;
+    }
+   }
+
+template<typename T>
+T getInputInRange(const std::string& prompt, T min, T max) {
+    T value;
+    while (true) {
+        std::cout << prompt;
+        std::cin >> value;
+
+        if (std::cin.fail() || value < min || value > max) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cerr << "Ошибка: введите значение от " << min << " до " << max << "\n";
+        }
+        else {
+            return value;
+        }
+    }
+}
+
+std::string inputZone() {
+    const std::vector<std::string> zones = { "parter", "balcony", "beletage" };
+    std::string zone;
+
+    while (true) {
+        std::cout << "Введите зону (parter/balcony/beletage): ";
+        std::cin >> zone;
+
+        if (std::find(zones.begin(), zones.end(), zone) == zones.end()) {
+            std::cerr << "Ошибка: допустимые значения: parter, balcony, beletage\n";
+        }
+        else {
+            return zone;
+        }
+    }
+}
+
 // Вспомогательные функции
-Ticket inputTicket() {
+Ticket inputTicket(TicketManager& ticketManager) {
     Ticket ticket;
-    std::cout << "Введите ID: ";
-    std::cin >> ticket.id;
-    std::cout << "Введите дату (дд.мм.гггг): ";
-    std::cin >> ticket.date;
-    std::cout << "Введите время (чч:мм): ";
-    std::cin >> ticket.time;
+    ticket.id = ticketManager.generateNextId();
+    std::cout << "Автоматически сгенерирован ID: " << ticket.id << "\n";
+
+    ticket.date = inputDate();
+    ticket.time = inputTime();
     std::cout << "Введите название представления: ";
     std::cin.ignore();
     std::getline(std::cin, ticket.performance);
-    std::cout << "Введите номер зала: ";
-    std::cin >> ticket.hallNumber;
+    ticket.hallNumber = getInputInRange("Введите номер зала (1-10): ", 1, 10);
     std::cout << "Введите зону (parter/balcony/beletage ): ";
-    std::cin >> ticket.zone;
-    std::cout << "Введите номер места: ";
-    std::cin >> ticket.seatNumber;
-    std::cout << "Введите возрастное ограничение: ";
-    std::cin >> ticket.ageLimit;
+    ticket.zone = inputZone();
+    ticket.seatNumber = getInputInRange("Введите номер места (1-100): ", 1, 100);
+    ticket.ageLimit = getInputInRange("Введите возрастное ограничение (0-18): ", 0, 18);
     return ticket;
 }
 
@@ -261,18 +401,17 @@ void showTicketMenu(TicketManager& ticketManager) {
             break;
         }
         case 2: {
-            Ticket ticket = inputTicket();
+            Ticket ticket = inputTicket(ticketManager);  // Передаем менеджер
             ticketManager.addTicket(ticket);
-            std::cout << "Билет добавлен!\n";
             break;
         }
         case 3: {
             int id;
             std::cout << "Введите ID билета для редактирования: ";
             std::cin >> id;
-            Ticket ticket = inputTicket();
+            Ticket ticket = inputTicket(ticketManager);
             ticketManager.editTicket(id, ticket);
-            std::cout << "Билет изменен!\n";
+            
             break;
         }
         case 4: {
@@ -280,7 +419,7 @@ void showTicketMenu(TicketManager& ticketManager) {
             std::cout << "Введите ID билета для удаления: ";
             std::cin >> id;
             ticketManager.removeTicket(id);
-            std::cout << "Билет удален!\n";
+            
             break;
         }
         case 5: {

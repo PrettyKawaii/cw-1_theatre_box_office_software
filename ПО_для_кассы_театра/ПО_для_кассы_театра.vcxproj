@@ -127,12 +127,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="TicketDisplay.cpp" />
     <ClCompile Include="ticket_system.cpp" />
     <ClCompile Include="ПО_для_кассы_театра.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TicketDisplay.h" />
     <ClInclude Include="ticket_system.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

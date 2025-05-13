@@ -37,8 +37,12 @@ public:
     TicketManager(const std::string& filename);
     ~TicketManager();
 
+    // Возвращает итератор на билет с указанным ID (или tickets.end(), если не найден)
+    std::vector<Ticket>::iterator findTicket(int id);
+    std::vector<Ticket>::const_iterator findTicket(int id) const; // const-версия
     void loadTickets();
     void saveTickets();
+    int generateNextId();
     void addTicket(const Ticket& ticket);
     void editTicket(int id, const Ticket& newTicket);
     void removeTicket(int id);
@@ -66,7 +70,7 @@ public:
 };
 
 // Прототипы вспомогательных функций
-Ticket inputTicket();
+Ticket inputTicket(TicketManager& ticketManager); 
 void printTickets(const std::vector<Ticket>& tickets);
 void printUsers(const std::vector<User>& users);
 void showAdminMenu(TicketManager& ticketManager, UserManager& userManager);

@@ -21,15 +21,9 @@
     <ClCompile Include="ticket_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TicketDisplay.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ticket_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TicketDisplay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
