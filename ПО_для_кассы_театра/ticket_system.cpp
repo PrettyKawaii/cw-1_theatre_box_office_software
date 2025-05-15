@@ -286,7 +286,6 @@ Ticket inputTicket(TicketManager& ticketManager) {
     std::cin.ignore();
     std::getline(std::cin, ticket.performance);
     ticket.hallNumber = getInputInRange("Введите номер зала (1-10): ", 1, 10);
-    std::cout << "Введите зону (parter/balcony/beletage ): ";
     ticket.zone = inputZone();
     ticket.seatNumber = getInputInRange("Введите номер места (1-100): ", 1, 100);
     ticket.ageLimit = getInputInRange("Введите возрастное ограничение (0-18): ", 0, 18);
