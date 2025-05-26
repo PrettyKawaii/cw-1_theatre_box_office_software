@@ -21,9 +21,15 @@
     <ClCompile Include="ticket_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="kit1_functions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ticket_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kit1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

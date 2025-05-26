@@ -7,6 +7,7 @@
 #include <string>
 #include <algorithm>
 #include <iomanip>
+#include <cstdlib> 
 
 // Структура для хранения данных о билете
 struct Ticket {
@@ -18,6 +19,8 @@ struct Ticket {
     std::string zone;
     int seatNumber;
     int ageLimit;
+    std::string saleDate;
+    double price;
 };
 
 // Структура для хранения данных о пользователе
@@ -76,5 +79,6 @@ void printUsers(const std::vector<User>& users);
 void showAdminMenu(TicketManager& ticketManager, UserManager& userManager);
 void showUserMenu(TicketManager& ticketManager);
 void showTicketMenu(TicketManager& ticketManager);
+
 
 #endif // TICKET_SYSTEM_H

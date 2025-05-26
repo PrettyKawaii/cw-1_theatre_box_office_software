@@ -1,3 +1,3 @@
-admin admin123 1
-user user123 0
+admin password1 1
+user password2 0
 alex bsuir4ever 1

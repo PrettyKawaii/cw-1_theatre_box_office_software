@@ -3,15 +3,21 @@
 #include "string"
 #include <iomanip> // для std::setw
 #include <regex>
+#include <cstdlib>
+#include <Windows.h>
+
+
+
 
 // Реализация TicketManager
 TicketManager::TicketManager(const std::string& filename) : dataFile(filename) {
     loadTickets();
 }
-
 TicketManager::~TicketManager() {
     saveTickets();
 }
+
+
 
 // Не-const версия (для изменения билета)
 std::vector<Ticket>::iterator TicketManager::findTicket(int id) {
@@ -248,7 +254,7 @@ T getInputInRange(const std::string& prompt, T min, T max) {
 
         if (std::cin.fail() || value < min || value > max) {
             std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+           // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cerr << "Ошибка: введите значение от " << min << " до " << max << "\n";
         }
         else {
@@ -364,6 +370,8 @@ void printUsers(const std::vector<User>& users) {
     }
     std::cout << m1 << std::endl;
 }
+// ticket_system.cpp (только измененные функции)
+
 void showTicketMenu(TicketManager& ticketManager) {
     int choice;
     bool back = false;
@@ -393,6 +401,8 @@ void showTicketMenu(TicketManager& ticketManager) {
         std::cout << "> ";
         std::cin >> choice;
 
+        system("cls||clear"); // Очистка терминала
+
         switch (choice) {
         case 1: {
             auto tickets = ticketManager.getAllTickets();
@@ -400,7 +410,7 @@ void showTicketMenu(TicketManager& ticketManager) {
             break;
         }
         case 2: {
-            Ticket ticket = inputTicket(ticketManager);  // Передаем менеджер
+            Ticket ticket = inputTicket(ticketManager);
             ticketManager.addTicket(ticket);
             break;
         }
@@ -410,7 +420,6 @@ void showTicketMenu(TicketManager& ticketManager) {
             std::cin >> id;
             Ticket ticket = inputTicket(ticketManager);
             ticketManager.editTicket(id, ticket);
-            
             break;
         }
         case 4: {
@@ -418,7 +427,6 @@ void showTicketMenu(TicketManager& ticketManager) {
             std::cout << "Введите ID билета для удаления: ";
             std::cin >> id;
             ticketManager.removeTicket(id);
-            
             break;
         }
         case 5: {
@@ -448,7 +456,6 @@ void showUserMenu(UserManager& userManager) {
     int var = 43;
 
     while (!back) {
-        
         std::cout << std::endl;
         std::cout << m1 << std::endl;
         std::cout << std::setw(var + 15) << std::left << "|Управление пользователями" << std::right << "|" << std::endl;
@@ -466,6 +473,8 @@ void showUserMenu(UserManager& userManager) {
 
         std::cout << "> ";
         std::cin >> choice;
+
+        system("cls||clear"); // Очистка терминала
 
         switch (choice) {
         case 1: {
@@ -523,21 +532,21 @@ void showAdminMenu(TicketManager& ticketManager, UserManager& userManager) {
     std::string m2 = "+----------------------------+";
     int var = 44;
 
-
     while (!back) {
-        //std::cout << "\n";
         std::cout << m1 << std::endl;
-        std::cout << std::setw(var+3) << std::left << "|Меню администратора" << std::right << "|" << std::endl;
+        std::cout << std::setw(var + 3) << std::left << "|Меню администратора" << std::right << "|" << std::endl;
         std::cout << m1 << std::endl;
-        std::cout << std::setw(var+3) << std::left << "|1. Управление билетами" << std::right << "|" << std::endl;
+        std::cout << std::setw(var + 3) << std::left << "|1. Управление билетами" << std::right << "|" << std::endl;
         std::cout << m2 << std::endl;
         std::cout << std::setw(var) << std::left << "|2. Управление пользователями" << std::right << "|" << std::endl;
         std::cout << m2 << std::endl;
-        std::cout << std::setw(var-10) << std::left << "|3. Выход" << std::right << "|" << std::endl;
+        std::cout << std::setw(var - 10) << std::left << "|3. Выход" << std::right << "|" << std::endl;
         std::cout << m1 << std::endl;
 
         std::cout << "> ";
         std::cin >> choice;
+
+        system("cls||clear"); // Очистка терминала
 
         switch (choice) {
         case 1:
@@ -560,7 +569,6 @@ void showUserMenu(TicketManager& ticketManager) {
     bool back = false;
 
     while (!back) {
-
         std::string m1 = "+===========================+";
         std::string m2 = "+---------------------------+";
         int var = 43;
@@ -577,6 +585,8 @@ void showUserMenu(TicketManager& ticketManager) {
 
         std::cout << "> ";
         std::cin >> choice;
+
+        system("cls||clear"); // Очистка терминала
 
         switch (choice) {
         case 1: {
