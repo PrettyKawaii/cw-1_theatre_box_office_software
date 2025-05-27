@@ -4,3 +4,4 @@
 
 std::string maskPassword();
 int inputDigit();
+void waitForAnyKeyAndClear();

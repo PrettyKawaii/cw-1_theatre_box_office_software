@@ -1,3 +1,4 @@
 admin password1 1
 user password2 0
 alex bsuir4ever 1
+admin 123 1

@@ -6,10 +6,12 @@
 #include <cstdlib>
 #include <Windows.h>
 
+#include "kit1.h"
 
 
 
-// Реализация TicketManager
+
+
 TicketManager::TicketManager(const std::string& filename) : dataFile(filename) {
     loadTickets();
 }
@@ -19,24 +21,14 @@ TicketManager::~TicketManager() {
 
 
 
-// Не-const версия (для изменения билета)
-std::vector<Ticket>::iterator TicketManager::findTicket(int id) {
-    return std::find_if(tickets.begin(), tickets.end(),
-        [id](const Ticket& t) { return t.id == id; });
-}
-
-// Const-версия (только для чтения)
-std::vector<Ticket>::const_iterator TicketManager::findTicket(int id) const {
-    return std::find_if(tickets.cbegin(), tickets.cend(),
-        [id](const Ticket& t) { return t.id == id; });
-}
 
 void TicketManager::loadTickets() {
     std::ifstream file(dataFile);
     if (file.is_open()) {
         Ticket ticket;
         while (file >> ticket.id >> ticket.date >> ticket.time >> ticket.performance
-            >> ticket.hallNumber >> ticket.zone >> ticket.seatNumber >> ticket.ageLimit) {
+            >> ticket.hallNumber >> ticket.zone >> ticket.seatNumber >> ticket.ageLimit
+            >> ticket.saleDate >> ticket.price) {
             tickets.push_back(ticket);
         }
         file.close();
@@ -44,16 +36,83 @@ void TicketManager::loadTickets() {
 }
 
 void TicketManager::saveTickets() {
-    std::ofstream file(dataFile);
-    if (file.is_open()) {
-        for (const auto& ticket : tickets) {
-            file << ticket.id << " " << ticket.date << " " << ticket.time << " "
-                << ticket.performance << " " << ticket.hallNumber << " "
-                << ticket.zone << " " << ticket.seatNumber << " " << ticket.ageLimit << "\n";
-        }
-        file.close();
+    std::ofstream file(dataFile, std::ios::out | std::ios::trunc); // Перезаписываем файл
+    if (!file.is_open()) {
+        std::cerr << "Ошибка: не удалось открыть файл для сохранения!\n";
+        return;
+    }
+
+    for (const auto& ticket : tickets) {
+        file << ticket.id << " "
+            << ticket.date << " "
+            << ticket.time << " "
+            << ticket.performance << " "
+            << ticket.hallNumber << " "
+            << ticket.zone << " "
+            << ticket.seatNumber << " "
+            << ticket.ageLimit << " "
+            << ticket.saleDate << " "
+            << ticket.price << "\n";
+    }
+
+    file.close();
+    //std::cout << "Билеты успешно сохранены.\n"; // Для отладки (можно убрать)
+}
+
+
+void printTicketsWithCheck(const std::vector<Ticket>& tickets) {
+    if (tickets.empty()) {
+        std::cout << "\n+=======================================+\n";
+        std::cout << "|              Билетов нет              |\n";
+        std::cout << "+=======================================+\n";
+    }
+    else {
+        printTickets(tickets); // Используем существующую функцию для вывода
     }
 }
+
+std::vector<Ticket> TicketManager::getAvailableTickets() const {
+    std::vector<Ticket> result;
+    for (const auto& ticket : tickets) {
+        if (ticket.saleDate.empty()) {
+            result.push_back(ticket);
+        }
+    }
+    return result;
+}
+
+void printAvailableTicketsWithCheck(const TicketManager& manager) {
+    auto tickets = manager.getAvailableTickets();
+    if (tickets.empty()) {
+        std::cout << "\n+=======================================+\n";
+        std::cout << "|      Нет свободных билетов           |\n";
+        std::cout << "+=======================================+\n";
+    } else {
+        printTickets(tickets);
+    }
+}
+
+int TicketManager::countAvailableTickets(const std::string& performance) const {
+    int count = 0;
+    for (const auto& ticket : tickets) {
+        if (ticket.saleDate.empty() && ticket.performance == performance) {
+            count++;
+        }
+    }
+    return count;
+}
+
+void TicketManager::setTicketSaleDate(int id, const std::string& saleDate) {
+    auto it = findTicket(id);
+    if (it == tickets.end()) {
+        std::cerr << "Ошибка: Билет с ID " << id << " не найден!\n";
+        return;
+    }
+    it->saleDate = saleDate;
+    std::cout << "Дата продажи билета успешно изменена.\n";
+}
+
+
 
 int TicketManager::generateNextId() {
     int maxId = 0;
@@ -214,6 +273,78 @@ std::string inputDate() {
         return date;
     }
 }
+
+// Не-const версия (для изменения билета)
+std::vector<Ticket>::iterator TicketManager::findTicket(int id) {
+    return std::find_if(tickets.begin(), tickets.end(),
+        [id](const Ticket& t) { return t.id == id; });
+}
+
+// Const-версия (только для чтения)
+std::vector<Ticket>::const_iterator TicketManager::findTicket(int id) const {
+    return std::find_if(tickets.cbegin(), tickets.cend(),
+        [id](const Ticket& t) { return t.id == id; });
+}
+
+bool UserManager::userExists(const std::string& login) const {
+    return std::any_of(users.begin(), users.end(),
+        [&login](const User& u) { return u.login == login; });
+}
+
+std::string inputSaleDate() {
+    std::regex datePattern(R"((\d{2})\.(\d{2})\.(\d{4}))");
+    std::string date;
+
+    while (true) {
+        std::cout << "Введите дату продажи (дд.мм.гггг или оставьте пустым для Free): ";
+        std::cin.ignore(); // Очищаем буфер перед вводом строки
+        std::getline(std::cin, date);
+
+        // Если строка пустая - билет свободен
+        if (date.empty()) {
+            return "";
+        }
+
+        std::smatch matches;
+        if (!std::regex_match(date, matches, datePattern)) {
+            std::cerr << "Ошибка: неверный формат даты!\n";
+            continue;
+        }
+
+        int day = std::stoi(matches[1].str());
+        int month = std::stoi(matches[2].str());
+        int year = std::stoi(matches[3].str());
+
+        if (month < 1 || month > 12) {
+            std::cerr << "Ошибка: месяц должен быть от 01 до 12!\n";
+            continue;
+        }
+
+        if (day < 1 || day > 31) {
+            std::cerr << "Ошибка: день должен быть от 01 до 31!\n";
+            continue;
+        }
+
+        bool isValid = true;
+        if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+            isValid = false;
+        }
+        else if (month == 2) {
+            bool isLeap = (year % 400 == 0) || (year % 100 != 0 && year % 4 == 0);
+            if (day > (isLeap ? 29 : 28)) {
+                isValid = false;
+            }
+        }
+
+        if (!isValid) {
+            std::cerr << "Ошибка: некорректная дата (день не соответствует месяцу)!\n";
+            continue;
+        }
+
+        return date;
+    }
+}
+
 std::string inputTime()
 {
     std::regex timePattern(R"((\d{2})\:(\d{2}))"); // чч:мм
@@ -295,6 +426,9 @@ Ticket inputTicket(TicketManager& ticketManager) {
     ticket.zone = inputZone();
     ticket.seatNumber = getInputInRange("Введите номер места (1-100): ", 1, 100);
     ticket.ageLimit = getInputInRange("Введите возрастное ограничение (0-18): ", 0, 18);
+    ticket.price = getInputInRange("Введите стоимость билета: ", 0.0, 10000.0);
+    ticket.saleDate = inputSaleDate();
+
     return ticket;
 }
 
@@ -302,9 +436,9 @@ void printTickets(const std::vector<Ticket>& tickets) {
     std::string m1 = "+=======================================+";
     std::string m2 = "+---------------------------------------+";
     int l1 = 19+4;
-    std::cout << "\n";
+    //std::cout << "\n";
     std::cout << m1 << std::endl;
-    std::cout << "\nСписок билетов:\n";
+    std::cout << "Список билетов:\n";
     std::cout << m1 << std::endl;
     // Определяем длину самого длинного поля
     const int max_field_length = 13; // "Представление" - 13 символов
@@ -326,7 +460,8 @@ void printTickets(const std::vector<Ticket>& tickets) {
         std::cout << "|Зал"; std::cout << std::setw(max_field_length - 3 + 3); std::cout << ": " << std::left << std::setw(l1) << ticket.hallNumber << "|\n";
         std::cout << "|Зона"; std::cout << std::setw(max_field_length - 4 + 3); std::cout << ": " << std::left << std::setw(l1) << ticket.zone << "|\n";
         std::cout << "|Место"; std::cout << std::setw(max_field_length - 5 + 3); std::cout << ": " << std::left << std::setw(l1) << ticket.seatNumber << "|\n";
-        std::cout << "|Ограничение"; std::cout << std::setw(max_field_length - 11 + 3); std::cout << ": " << std::left << std::setw(l1) << ticket.ageLimit << "|\n";
+        std::cout << "|Ограничение"; std::cout << std::setw(max_field_length - 11 + 3); std::cout << ": " << std::left << std::setw(l1) << (std::to_string(ticket.ageLimit) + "+") << "|\n";
+        std::cout << "|Дата продажи"; std::cout << std::setw(max_field_length - 11 + 2); std::cout << ": " << std::left << std::setw(l1) << (ticket.saleDate.empty() ? "Free" : ticket.saleDate) << "|\n";        std::cout << "|Цена"; std::cout << std::setw(max_field_length - 4 + 3); std::cout << ": " << std::left << std::setw(l1) << ticket.price << "|\n";
 
     }
     std::cout << m1 << std::endl;
@@ -375,9 +510,9 @@ void printUsers(const std::vector<User>& users) {
 void showTicketMenu(TicketManager& ticketManager) {
     int choice;
     bool back = false;
-    std::string m1 = "+===========================+";
-    std::string m2 = "+---------------------------+";
-    int var = 43;
+    std::string m1 = "+===============================================+";
+    std::string m2 = "+-----------------------------------------------+";
+    int var = 63;
 
     while (!back) {
         std::cout << "\n";
@@ -395,18 +530,27 @@ void showTicketMenu(TicketManager& ticketManager) {
         std::cout << m2 << std::endl;
         std::cout << std::setw(var + 2) << std::left << "|5. Фильтровать билеты" << std::right << "|" << std::endl;
         std::cout << m2 << std::endl;
-        std::cout << std::setw(var - 10) << std::left << "|6. Назад" << std::right << "|" << std::endl;
+        std::cout << std::setw(var + 11) << std::left << "|6. Просмотреть свободные билеты" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var + 3) << std::left << "|7. Подсчитать свободные билеты по представлению" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var + 12) << std::left << "|8. Установить дату продажи билета" << std::right << "|" << std::endl;
+        std::cout << m2 << std::endl;
+        std::cout << std::setw(var - 10) << std::left << "|9. Назад" << std::right << "|" << std::endl;
         std::cout << m1 << std::endl;
 
+
         std::cout << "> ";
-        std::cin >> choice;
+        int choice;
+        choice = inputDigit();
 
         system("cls||clear"); // Очистка терминала
 
         switch (choice) {
         case 1: {
             auto tickets = ticketManager.getAllTickets();
-            printTickets(tickets);
+            printTicketsWithCheck(tickets); 
+            waitForAnyKeyAndClear();
             break;
         }
         case 2: {
@@ -433,13 +577,52 @@ void showTicketMenu(TicketManager& ticketManager) {
             std::string field, value;
             std::cout << "Введите поле для фильтрации (date/performance/zone): ";
             std::cin >> field;
-            std::cout << "Введите значение: ";
-            std::cin >> value;
+
+            if (field == "zone") {
+                value = inputZone(); // Используем существующую проверку зоны
+            }
+            else {
+                std::cout << "Введите значение: ";
+                std::cin >> value;
+            }
+
             auto tickets = ticketManager.filterTickets(field, value);
-            printTickets(tickets);
+            if (tickets.empty()) {
+                std::cout << "\n+=======================================+\n";
+                std::cout << "|      Билеты не найдены               |\n";
+                std::cout << "+=======================================+\n";
+            }
+            else {
+                printTickets(tickets);
+            }
+            waitForAnyKeyAndClear();
+            break;
+
+        }
+        case 6: {
+            auto tickets = ticketManager.getAvailableTickets();
+            printTicketsWithCheck(tickets);
+            waitForAnyKeyAndClear();
             break;
         }
-        case 6:
+        case 7: {
+            std::string performance;
+            std::cout << "Введите название представления: ";
+            
+            std::getline(std::cin, performance);
+            int count = ticketManager.countAvailableTickets(performance);
+            std::cout << "Количество свободных билетов на '" << performance << "': " << count << "\n";
+            break;
+        }
+        case 8: {
+            int id;
+            std::cout << "Введите ID билета: ";
+            std::cin >> id;
+            std::string saleDate = inputSaleDate();
+            ticketManager.setTicketSaleDate(id, saleDate);
+            break;
+        }
+        case 9:
             back = true;
             break;
         default:
@@ -472,7 +655,8 @@ void showUserMenu(UserManager& userManager) {
         std::cout << m1 << std::endl;
 
         std::cout << "> ";
-        std::cin >> choice;
+        int choice;
+        choice = inputDigit();
 
         system("cls||clear"); // Очистка терминала
 
@@ -480,6 +664,7 @@ void showUserMenu(UserManager& userManager) {
         case 1: {
             auto users = userManager.getAllUsers();
             printUsers(users);
+            waitForAnyKeyAndClear();
             break;
         }
         case 2: {
@@ -487,12 +672,20 @@ void showUserMenu(UserManager& userManager) {
             bool isAdmin;
             std::cout << "Введите логин: ";
             std::cin >> login;
+
+            if (userManager.userExists(login)) {
+                std::cout << "Ошибка: пользователь с таким логином уже существует!\n";
+                waitForAnyKeyAndClear();
+                break;
+            }
+
             std::cout << "Введите пароль: ";
             std::cin >> password;
             std::cout << "Администратор? (1 - да, 0 - нет): ";
             std::cin >> isAdmin;
             userManager.addUser(login, password, isAdmin);
             std::cout << "Пользователь добавлен!\n";
+            waitForAnyKeyAndClear();
             break;
         }
         case 3: {
@@ -506,6 +699,7 @@ void showUserMenu(UserManager& userManager) {
             std::cin >> isAdmin;
             userManager.editUser(login, password, isAdmin);
             std::cout << "Пользователь изменен!\n";
+            waitForAnyKeyAndClear();
             break;
         }
         case 4: {
@@ -514,6 +708,7 @@ void showUserMenu(UserManager& userManager) {
             std::cin >> login;
             userManager.removeUser(login);
             std::cout << "Пользователь удален!\n";
+            waitForAnyKeyAndClear();
             break;
         }
         case 5:
@@ -544,7 +739,8 @@ void showAdminMenu(TicketManager& ticketManager, UserManager& userManager) {
         std::cout << m1 << std::endl;
 
         std::cout << "> ";
-        std::cin >> choice;
+        int choice;
+        choice = inputDigit();
 
         system("cls||clear"); // Очистка терминала
 
@@ -569,22 +765,23 @@ void showUserMenu(TicketManager& ticketManager) {
     bool back = false;
 
     while (!back) {
-        std::string m1 = "+===========================+";
-        std::string m2 = "+---------------------------+";
-        int var = 43;
+        std::string m1 = "+==================================+";
+        std::string m2 = "+----------------------------------+";
+        int var = 50;
 
         std::cout << m1 << std::endl;
-        std::cout << std::setw(var + 3) << std::left << "|Меню пользователя" << std::right << "|" << std::endl;
+        std::cout << std::setw(var + 1) << std::left << "|Меню пользователя" << std::right << "|" << std::endl;
         std::cout << m1 << std::endl;
-        std::cout << std::setw(var + 3) << std::left << "|1. Просмотреть все билеты" << std::right << "|" << std::endl;
+        std::cout << std::setw(var + 5) << std::left << "|1. Просмотреть все билеты" << std::right << "|" << std::endl;
         std::cout << m2 << std::endl;
-        std::cout << std::setw(var + 3) << std::left << "|2. Поиск билетов" << std::right << "|" << std::endl;
+        std::cout << std::setw(var - 3) << std::left << "|2. Поиск билетов" << std::right << "|" << std::endl;
         std::cout << m2 << std::endl;
         std::cout << std::setw(var - 10) << std::left << "|3. Выход" << std::right << "|" << std::endl;
         std::cout << m1 << std::endl;
 
         std::cout << "> ";
-        std::cin >> choice;
+        int choice;
+        choice = inputDigit();
 
         system("cls||clear"); // Очистка терминала
 
@@ -592,16 +789,32 @@ void showUserMenu(TicketManager& ticketManager) {
         case 1: {
             auto tickets = ticketManager.getAllTickets();
             printTickets(tickets);
+            waitForAnyKeyAndClear();
             break;
         }
         case 2: {
             std::string field, value;
             std::cout << "Введите поле для поиска (date/performance/zone): ";
             std::cin >> field;
-            std::cout << "Введите значение: ";
-            std::cin >> value;
+
+            if (field == "zone") {
+                value = inputZone(); // Используем существующую проверку зоны
+            }
+            else {
+                std::cout << "Введите значение: ";
+                std::cin >> value;
+            }
+
             auto tickets = ticketManager.filterTickets(field, value);
-            printTickets(tickets);
+            if (tickets.empty()) {
+                std::cout << "\n+=======================================+\n";
+                std::cout << "|      Билеты не найдены               |\n";
+                std::cout << "+=======================================+\n";
+            }
+            else {
+                printTickets(tickets);
+            }
+            waitForAnyKeyAndClear();
             break;
         }
         case 3:
@@ -612,3 +825,4 @@ void showUserMenu(TicketManager& ticketManager) {
         }
     }
 }
+

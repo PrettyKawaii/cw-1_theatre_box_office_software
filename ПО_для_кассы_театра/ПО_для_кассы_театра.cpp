@@ -57,7 +57,8 @@ int main() {
 
             if (userManager.authenticate(login, password, isAdmin)) {
                 if (isAdmin) {
-                    std::cout << "\nВы успешно авторизовались как администратор.\n" << std::endl;
+                    std::cout << "\nВы успешно авторизовались как администратор." << std::endl;
+                    waitForAnyKeyAndClear();
                     showAdminMenu(ticketManager, userManager);
                 }
                 else {
@@ -79,6 +80,7 @@ int main() {
 
             if (userManager.authenticate(login, password, isAdmin)) {
                 std::cout << "\nВы успешно авторизовались как пользователь." << std::endl;
+                waitForAnyKeyAndClear();
                 showUserMenu(ticketManager);
             }
             else {
@@ -86,7 +88,7 @@ int main() {
             }
             break;
         }
-        case 3:
+        case 3:       
             exit = true;
             break;
         default:

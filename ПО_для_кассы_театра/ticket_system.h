@@ -1,5 +1,4 @@
-#ifndef TICKET_SYSTEM_H
-#define TICKET_SYSTEM_H
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -40,6 +39,11 @@ public:
     TicketManager(const std::string& filename);
     ~TicketManager();
 
+    
+
+    std::vector<Ticket> getAvailableTickets() const;
+    int countAvailableTickets(const std::string& performance) const;
+
     // Возвращает итератор на билет с указанным ID (или tickets.end(), если не найден)
     std::vector<Ticket>::iterator findTicket(int id);
     std::vector<Ticket>::const_iterator findTicket(int id) const; // const-версия
@@ -49,8 +53,12 @@ public:
     void addTicket(const Ticket& ticket);
     void editTicket(int id, const Ticket& newTicket);
     void removeTicket(int id);
+    void setTicketSaleDate(int id, const std::string& saleDate);
+
     std::vector<Ticket> getAllTickets() const;
     std::vector<Ticket> filterTickets(const std::string& field, const std::string& value) const;
+
+
 };
 
 // Класс для работы с пользователями
@@ -69,6 +77,7 @@ public:
     void addUser(const std::string& login, const std::string& password, bool isAdmin);
     void editUser(const std::string& login, const std::string& newPassword, bool newIsAdmin);
     void removeUser(const std::string& login);
+    bool userExists(const std::string& login) const;
     std::vector<User> getAllUsers() const;
 };
 
@@ -79,6 +88,3 @@ void printUsers(const std::vector<User>& users);
 void showAdminMenu(TicketManager& ticketManager, UserManager& userManager);
 void showUserMenu(TicketManager& ticketManager);
 void showTicketMenu(TicketManager& ticketManager);
-
-
-#endif // TICKET_SYSTEM_H
